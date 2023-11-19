@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"
+        integrity="sha256-/H4YS+7aYb9kJ5OKhFYPUjSJdrtV6AeyJOtTkw6X72o=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/pbkdf2.js"></script>
+    <title>simple UI</title>
+</head>
+
+<body>
+    <label for="pwd">pass:</label>
+    <input type="password" id="pwd" name="pwd" />
+    <input type="radio" id="soup" name="meal" value="soup" />
+    <br><br>
+
+
+    <!-- encode -->
+    <textarea id="plain_text" name="plain_text" rows="5" cols="33" placeholder="plain text"></textarea>
+
+    <br>
+    <!-- decode -->
+    <textarea id="encoded_text" name="encoded_text" rows="5" cols="33" placeholder="encoded text"></textarea>
+
+
+    <script>
+        // init
+        const pwd_element = document.querySelector("#pwd");
+
+        let key = localStorage.getItem('key');
+        pwd_element.textContent = key;
+
+        function update_box() {
+            if (localStorage.hasOwnProperty('key')) {
+                document.getElementById("soup").checked = true;
+            } else {
+                document.getElementById("soup").checked = false;
+            }
+        };
+
+        update_box();
+
+        pwd_element.addEventListener("input", () => {
+
+            console.log(`pwd: ${pwd_element.value}`);
+
+            pwd_element.textContent = pwd_element.textContent;
+            localStorage.setItem('key', pwd_element.value);
+
+            update_box();
+
+
+        });
+
+
+
+        const encoded_text = document.querySelector("#encoded_text");
+        const plain_text = document.querySelector("#plain_text");
+
+        plain_text.addEventListener("input", () => {
+
+
+            let key = localStorage.getItem('key');
+            if (!key) {
+                alert("set password!");
+                return;
+            };
+
+
+            console.log(`plain_text: key:${key}; text=${plain_text.value}`);
+
+            let encrypted = CryptoJS.AES.encrypt(
+                plain_text.value, key
+            );
+
+            console.log(`encrypted: ${encrypted}`);
+            encoded_text.value = encrypted;
+
+
+        });
+
+
+        encoded_text.addEventListener("input", () => {
+
+
+            let key = localStorage.getItem('key');
+            if (!key) {
+                alert("set password!");
+                return;
+            };
+
+            console.log(`decrypt_text: key:${key}; text=${encoded_text.value}`);
+
+            let decrypted_str = CryptoJS.AES.decrypt(encoded_text.value, key).toString(CryptoJS.enc.Utf8);
+
+            console.log(`decrypted_str: ${decrypted_str}`);
+            plain_text.value = decrypted_str;
+            console.log(document.getElementById("plain_text").innerHtml);
+
+        });
+    </script>
+
+
+    </html>
